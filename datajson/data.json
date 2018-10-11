@@ -1,0 +1,25 @@
+{
+  "beverages": "Coffee,Coke",
+  "snacks": "Chips,Cookies",
+  "scales": "Major,Minor",
+  "info":
+        {
+          "0":{
+              "scale":"0,2,4,5,7,9,11",
+              "description":"Major_Scale"
+          },
+          "1":{
+              "scale":"0,2,3,5,7,8,11",
+              "description":"Harmonic Minor"
+          },
+          "2":{
+              "scale":"0,2,3,5,7,9,11",
+              "description":"Melodic Minor"
+          },
+          "3":{
+              "scale":"0,2,3,5,7,8,10",
+              "description":"Natural Minor"
+          }
+        }
+
+}

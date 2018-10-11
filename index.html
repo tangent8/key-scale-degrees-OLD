@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Key Scale Degrees V2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/css/bootstrap.min.css'>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body onresize="update()">
+<!-- <div id="myDiv" data-left-margin=40 data-top-margin=40 data-bottom-margin=60 ></div> -->
+<input type="checkbox" class="hide" id="p1">
+<!-- <input type="checkbox" class="hide" id="p2"> -->
+<label for="p1" class="button">Click me</label>
+<!-- <label for="p2" class="button">Click me too</label> -->
+<input type="button" value="Print" onclick="printCanvas();">
+<image id="theimage"></image>
+
+<div id="popup1" class="overlay">
+	<div class="popup">
+		<h2>Info box</h2>
+    <label for="p1" class="close">&times;</label>
+		<div class="content">
+			<p>This is done totally without JavaScript. Just HTML and CSS.</p>
+		</div>
+	</div>
+</div>
+
+<!-- <div id="popup2" class="overlay light">
+	<label for="p2" class="cancel"></label>
+	<div class="popup">
+		<h2>What the what?</h2>
+		<div class="content">
+      <p>Click outside the popup to close.</p>
+		</div>
+	</div>
+</div> -->
+
+<button id="myBtn">Open Popup</button>
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <p>Some text in the Modal..</p>
+    <p>More</p>
+    <p>..want soup</p>
+  </div>
+
+</div>
+
+<div id="options" class="dropdown">
+  <div id="key" class="keyDropdown">
+    <span class="tooltiptext">  Key  </span>
+    <select id="chordroot" onchange="updateKey();">
+      <optgroup label="-- Root Note --">
+        <!-- <option selected value=1>C</option>
+        <option value=3>D</option>
+        <option value=5>E</option>
+        <option value=8>G</option>
+        <option value=10>A</option> -->
+        <option selected value=1>C</option>
+        <option value=2>C#/Db</option>
+        <option value=3>D</option>
+        <option value=4>D#/Eb</option>
+        <option value=5>E</option>
+        <option value=6>F</option>
+        <option value=7>F#/Gb</option>
+        <option value=8>G</option>
+        <option value=9>G#/Ab</option>
+        <option value=10>A</option>
+        <option value=11>A#/Bb</option>
+        <option value=12>B</option>
+      </optgroup>
+    </select>
+  </div>
+    <select id="scale" onchange="updateKey();">
+      <optgroup label="-- Chord/Scale --">
+      <option selected value=1>Major Chord</option>
+      <option value=2>Minor Chord</option>
+      <option value=3>Diminished Chord</option>
+      </optgroup>
+    </select>
+
+    <select id="sharpOrFlat" onchange="update();">
+      <optgroup label="-- Root Preference --">
+      <option selected value=1>Sharp</option>
+      <option value=2>Flat</option>
+      </optgroup>
+    </select>
+
+    <select id="nameOrDegree" onchange="update();">
+      <optgroup label="-- Display --">
+      <option selected value=1>Note</option>
+      <option value=2>Degree</option>
+      </optgroup>
+    </select>
+
+    <!-- <select id="rootString" onchange="updateKey();">
+      <optgroup label="-- String as Root --">
+      <option selected value=1>All</option>
+      <option value=2>6th string</option>
+      <option value=3>5th string</option>
+      <option value=4>4th string</option>
+      <option value=5>3th string</option>
+      </optgroup>
+    </select> -->
+
+    <select id="tuning" onchange="update();">
+      <optgroup label="-- Tuning --">
+      <option selected value=1>EADGBE</option>
+      <option value=2>DADGBE</option>
+      </optgroup>
+    </select>
+
+    <select id="size" onchange="update();">
+      <optgroup label="-- Size --">
+      <option selected value=100>100%</option>
+      <option value=90>90%</option>
+      <option value=80>80%</option>
+      <option value=70>70%</option>
+      <option value=60>60%</option>
+      <option value=50>50%</option>
+      </optgroup>
+    </select>
+</div>
+
+<div class="tab-block" id = "tab-block">
+  <ul class="tab-mnu">
+    <li id="tab1" class = "active">1</li>
+    <li id="tab2">2</li>
+    <li id="tab3">3</li>
+    <li id="tab4">4</li>
+    <li id="tab5">5</li>
+    <li id="tab6">6</li>
+    <li id="tab7">7</li>
+    <li id="tab8">8</li>
+  </ul>
+
+  <div class="tab-cont">
+    <div class="tab-pane">
+      <canvas id="canvas1" width="280" height="280"></canvas>
+    </div>
+    <div class="tab-pane">
+      <canvas id="canvas2" width="880" height="280"></canvas>
+    </div>
+    <div class="tab-pane">
+      <canvas id="canvas3" width="880" height="280"></canvas>
+    </div>
+    <div class="tab-pane">
+      <canvas id="canvas4" width="880" height="280"></canvas>
+    </div>
+    <div class="tab-pane">
+      <canvas id="canvas5" width="880" height="280"></canvas>
+    </div>
+    <div class="tab-pane">
+      <canvas id="canvas6" width="880" height="280"></canvas>
+    </div>
+    <div class="tab-pane">
+      <canvas id="canvas7" width="880" height="280"></canvas>
+    </div>
+    <div class="tab-pane">
+      <canvas id="canvas8" width="880" height="280"></canvas>
+    </div>
+    <div class="tab-pane">
+      <canvas id="canvasAll" width="880" height="280"></canvas>
+    </div>
+
+<!--     <div class="tab-pane">
+      <p> Key of G - chord members G,A,B,C,D,E,F#,G</p>
+    </div>     -->
+  </div>
+</div>
+</body>
+  <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.debug.js" integrity="sha384-THVO/sM0mFD9h7dfSndI6TS0PgAGavwKvB5hAxRRvc0o9cPLohB0wb/PTA7LdUHs" crossorigin="anonymous"></script>
+  <script  src="js/index.js"></script>
+
+</html>

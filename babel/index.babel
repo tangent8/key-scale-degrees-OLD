@@ -1,0 +1,460 @@
+$(document).ready(function(){      
+// get element from CSS
+  var element = document.getElementById('tab-block'),
+      style = window.getComputedStyle(element),
+      width = style.getPropertyValue('width');
+  
+  var tabWrapper = $('#tab-block'),
+      tabMnu = tabWrapper.find('.tab-mnu  li'),
+      tabContent = tabWrapper.find('.tab-cont > .tab-pane');
+  
+  tabContent.not(':first-child').hide();
+  
+  tabMnu.each(function(i){
+    $(this).attr('data-tab','tab'+i);
+  });
+  tabContent.each(function(i){
+    $(this).attr('data-tab','tab'+i);
+  });
+  
+  tabMnu.click(function(){
+    var tabData = $(this).data('tab');
+    tabWrapper.find(tabContent).hide();
+    tabWrapper.find(tabContent).filter('[data-tab='+tabData+']').show(); 
+  });
+  
+  $('.tab-mnu > li').click(function(){
+    var before = $('.tab-mnu li.active');
+    before.removeClass('active');
+    $(this).addClass('active');
+   });
+  
+  drawall();
+});
+
+// my Code
+function chordrootChg() {
+  var z1 = document.getElementById("chordroot");
+  var z2 = document.getElementById("tuning");
+
+  //document.getElementsByClassName('tab1').addClass('active');
+    
+  var selTuning = Number(z2.options[z2.selectedIndex].value);
+  if (selTuning == 2)
+    Tuning = [5, 12, 8, 3, 10, 3];
+  else
+    Tuning = [5, 12, 8, 3, 10, 5];    
+  
+  var index = Number(z1.options[z1.selectedIndex].value);
+  //if (index == 1 || index == 3 || index == 5 || index == 7 || index == 8 || index == 10 || index == 12)
+  if ([1,3,5,7,8,10,12].indexOf(index) >= 0)    
+    document.getElementById("sharpOrFlat").value = 1;      
+  else
+    document.getElementById("sharpOrFlat").value = 2;  
+
+  if (index == 2 || index == 7)
+    document.getElementById("sharpOrFlat").disabled=false;
+  else
+    document.getElementById("sharpOrFlat").disabled=true;    
+
+  var tab = document.getElementById("tab-mnu");
+  $(":first");
+  $("p:nth-child(3)")
+  
+  drawall();
+}
+
+function drawall() {
+  var z1 = document.getElementById("chordroot");
+  var rootIndex = Number(z1.options[z1.selectedIndex].value) - 1;
+  var z2 = document.getElementById("scale");
+  var scaleIndex = z2.options[z2.selectedIndex].value - 1;
+  
+  // if (rootIndex > -1){
+    draw("canvas", rootIndex, scaleIndex);
+      rootIndex += 2;
+      if (rootIndex > 11) rootIndex -= 12;
+      scaleIndex = 1;
+    draw("canvas2", rootIndex, scaleIndex);    
+      rootIndex += 2;
+      //alert(rootIndex);
+      if (rootIndex > 11) rootIndex -= 12;
+      scaleIndex = 1;
+    draw("canvas3", rootIndex, scaleIndex);    
+      rootIndex += 1;
+      if (rootIndex > 11) rootIndex -= 12;
+      scaleIndex = 0;
+    draw("canvas4", rootIndex, scaleIndex);    
+      rootIndex += 2;
+      if (rootIndex > 11) rootIndex -= 12;
+      scaleIndex = 0;
+    draw("canvas5", rootIndex, scaleIndex);    
+      rootIndex += 2;
+      if (rootIndex > 11) rootIndex -= 12;
+      scaleIndex = 1;
+    draw("canvas6", rootIndex, scaleIndex);    
+      rootIndex += 2;
+      if (rootIndex > 11) rootIndex -= 12;
+      scaleIndex = 2;
+    draw("canvas7", rootIndex, scaleIndex);    
+  // }
+}
+
+function draw(canvasname, rootIndex, scaleIndex) {
+  var canvas = document.getElementById(canvasname);
+  var size = document.getElementById("size");  
+  var ratio = Number(size.options[size.selectedIndex].value);  
+    
+  var canvasWidth = window.innerWidth * ratio/100;
+  var left = $("#myDiv").data("left-margin"); 
+  var top = $("#myDiv").data("top-margin"); 
+  var bot = $("#myDiv").data("bottom-margin");    
+  var strLen = canvasWidth - left;
+  var fw = strLen/16; // fret width; 16=num frets
+  var fh = fw * 2 / 3;
+  var canvasHeight = fh * 5 + top + bot;
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+  //alert("canvasWidth - " + canvasWidth + ", canvasHeight - " + canvasHeight);  
+    
+  if (canvas.getContext) {
+    var ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+    drawstrings(canvasname, canvasWidth, canvasHeight);
+    getnotes(canvasname, canvasWidth, canvasHeight, rootIndex, scaleIndex);
+  }
+}
+
+function line(canvasname, startx, starty, endx, endy, width, isString) {
+  var canvas = document.getElementById(canvasname);
+
+  if (canvas.getContext) {
+    var ctx = canvas.getContext("2d");
+
+    ctx.lineWidth=width;
+    if (isString)
+      ctx.strokeStyle="#E7BE8E"; 
+    else
+      ctx.strokeStyle="#8CA2A7";       
+    ctx.beginPath();
+    ctx.moveTo(startx, starty);
+    ctx.lineTo(endx, endy);
+    ctx.closePath();
+    ctx.stroke();
+  }
+}
+
+function circle(canvasname, startx, starty, width, height, isFret, isRoot) {
+  var canvas = document.getElementById(canvasname);
+
+  if (canvas.getContext) {
+    var ctx = canvas.getContext("2d");
+    
+    if (isFret || isRoot) {
+      // b was passed and has truthy value
+      var color = "grey";
+    } else {
+      // b was not passed or has falsy value
+      var color = "black";
+    }
+
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(startx, starty, width, height, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function drawstrings(canvasname, canvasWidth, canvasHeight) {
+  // start coordinates (x,y) - to quickly adjust placement of 
+  var x = $("#myDiv").data("left-margin");  // label string tuning
+  var y = $("#myDiv").data("top-margin");  // label fret #
+  var bot = $("#myDiv").data("bottom-margin");    
+
+  var strLen = canvasWidth - x*2;
+  var fw = strLen/16; // fret width; 16=num frets  
+  var fh = fw * 2 / 3;
+    
+  // strings
+  line(canvasname, x, y + 0, x + strLen, y + 0, 1, true);
+  line(canvasname, x, y + fh, x + strLen, y + fh, 2, true);
+  line(canvasname, x, y + (fh*2), x + strLen, y + (fh*2), 3, true);
+  line(canvasname, x, y + (fh*3), x + strLen, y + (fh*3), 4, true);
+  line(canvasname, x, y + (fh*4), x + strLen, y + (fh*4), 5, true);
+  line(canvasname, x, y + (fh*5), x + strLen, y + (fh*5), 6, true);
+  // frets
+  // line(x+0,y+0,x+0,y+200);
+  //line(canvasname, x, y + 0, x, y + 200, 1);
+  line(canvasname, x + fw, y + 0, x + fw, y + (fh*5), 6);
+  line(canvasname, x + fw*2, y + 0, x + fw*2, y + (fh*5), 1);
+  line(canvasname, x + fw*3, y + 0, x + fw*3, y + (fh*5), 1);
+  line(canvasname, x + fw*4, y + 0, x + fw*4, y + (fh*5), 1);
+  line(canvasname, x + fw*5, y + 0, x + fw*5, y + (fh*5), 1);
+  line(canvasname, x + fw*6, y + 0, x + fw*6, y + (fh*5), 1);
+  line(canvasname, x + fw*7, y + 0, x + fw*7, y + (fh*5), 1);
+  line(canvasname, x + fw*8, y + 0, x + fw*8, y + (fh*5), 1);
+  line(canvasname, x + fw*9, y + 0, x + fw*9, y + (fh*5), 1);
+  line(canvasname, x + fw*10, y + 0, x + fw*10, y + (fh*5), 1);
+  line(canvasname, x + fw*11, y + 0, x + fw*11, y + (fh*5), 1);
+  line(canvasname, x + fw*12, y + 0, x + fw*12, y + (fh*5), 1);
+  line(canvasname, x + fw*13, y + 0, x + fw*13, y + (fh*5), 1);
+  line(canvasname, x + fw*14, y + 0, x + fw*14, y + (fh*5), 1);
+  line(canvasname, x + fw*15, y + 0, x + fw*15, y + (fh*5), 1);
+  line(canvasname, x + fw*16, y + 0, x + fw*16, y + (fh*5), 1);
+
+  drawfrets(canvasname, canvasWidth);
+}
+
+function drawfrets(canvasname, canvasWidth) {
+  var width = 7;  
+  var x2 = $("#myDiv").data("left-margin");  // label string tuning  
+  var y2 = $("#myDiv").data("top-margin");  // label fret # 
+  var strLen = canvasWidth - x2;
+  var fw = strLen/16; // fret width; 16=num frets
+  var x = x2 + (fw/2);
+  var y = y2/4;
+  
+  // draw all notes later
+  for (ab = 0; ab < 16; ab++) {
+    //if (ab == 3 || ab == 5 || ab == 7 || ab == 9 || ab == 15)
+    if ([3,5,7,9,15].indexOf(ab) >= 0)          
+      circle(canvasname, x + ab * fw, y, width, 0, true);
+
+    if (ab == 12) {
+      circle(canvasname, x + ab * fw - (width + 3), y, width, 0, true);
+      circle(canvasname, x + ab * fw + (width + 3), y, width, 0, true);
+    }
+
+    shownums(canvasname, canvasWidth, ab, fw, x, 12);
+  }
+  showstrings(canvasname, canvasWidth);
+}
+
+function shownums(canvasname, canvasWidth, ab, fw, startx, starty) {
+  var canvas = document.getElementById(canvasname);
+    
+  if (canvas.getContext) {
+    var ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "black";
+    ctx.font = "bold 14px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    // ctx.fillText(note, startx, starty);
+    ctx.fillText(ab, startx + ab * fw, starty);
+  }
+}
+
+function showstrings(canvasname, canvasWidth) {
+  var canvas = document.getElementById(canvasname);
+  var x2 = $("#myDiv").data("left-margin");  // label string tuning  
+  var y2 = $("#myDiv").data("top-margin");  // label fret # 
+  var bot = $("#myDiv").data("bottom-margin");    
+  var strLen = canvasWidth - x2;
+  var fw = strLen/16; 
+  var fh = fw * 2 / 3;
+  var width = fh/2 * 0.8;  
+    
+  if (canvas.getContext) {
+    var ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "black";
+    var fontstr = "bold " + width + "px sans-serif";
+    ctx.font = fontstr;  
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    for (ab = 0; ab < 6; ab++) {
+      //var label = Tuning[ab];                  
+      //ctx.fillText(label, x2/2, y2 + (ab * 40));    
+      if (ab == 0)
+        ctx.fillText("E", x2/2, y2 + (ab * fh));    
+      if (ab == 1)
+        ctx.fillText("B", x2/2, y2 + (ab * fh));    
+      if (ab == 2)
+        ctx.fillText("G", x2/2, y2 + (ab * fh));    
+      if (ab == 3)
+        ctx.fillText("D", x2/2, y2 + (ab * fh));    
+      if (ab == 4)
+        ctx.fillText("A", x2/2, y2 + (ab * fh));    
+      if (ab == 5)
+        ctx.fillText("E", x2/2, y2 + (ab * fh));    
+    }
+    
+  }
+}
+
+function showlabel(canvasname, label) {
+  var canvas = document.getElementById(canvasname);
+  
+  if (canvas.getContext) {
+    var ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "black";
+    ctx.font = "bold 16px sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, 50, 470);
+  }
+}
+
+function drawnotes(canvasname, startx, starty, isRoot, width) {
+  circle(canvasname, startx, starty, width, width, false, isRoot);  
+}
+
+function labelnotes(canvasname, note, startx, starty, width) {
+  var canvas = document.getElementById(canvasname);
+
+  if (canvas.getContext) {
+    var ctx = canvas.getContext("2d");
+    var fontstr = "bold " + width + "px sans-serif";
+    ctx.font = fontstr;  
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(note, startx, starty);
+  }
+}
+
+function getnotes(canvasname, canvasWidth, canvasHeight, rootIndex, scaleIndex) {
+  //alert("rootIndex - " + rootIndex + ", scaleIndex - " + scaleIndex);
+  var x = $("#myDiv").data("left-margin");  // label string tuning
+  var y = $("#myDiv").data("top-margin");  // label fret #
+  var strLen = canvasWidth - x;
+  var fw = strLen/16; // fret width; 16=num frets
+  var fh = fw * 2 / 3;  
+  var width = fh/2 * 0.8; //16;
+  //alert(width);
+  
+  var foffset = fw; //50;
+  var soffset = fh; //40;
+
+  // Get root
+  var c = document.getElementById("chordroot");
+  var rootValue = Number(c.options[rootIndex].value);
+  var rootLabel = c.options[rootIndex].label;
+  var s = document.getElementById("scale");
+  var scalestring = ScaleMembers[scaleIndex];
+  var scaleLabel = s.options[scaleIndex].label;
+  var scale = scalestring.toString().split(",");
+  var sf = document.getElementById("sharpOrFlat");
+  if (rootValue==2 || rootValue==4 || rootValue==7 || rootValue==9 || rootValue==11) {    
+    if (Number(sf.options[sf.selectedIndex].value) == 1)  
+      rootLabel = rootLabel.substring(0,2);
+    else if (Number(sf.options[sf.selectedIndex].value) == 2)
+      rootLabel = rootLabel.substring(3);
+  }
+
+  var description = rootLabel + " " + scaleLabel + " (" + scalestring + ")";
+  showlabel(canvasname, description);
+
+  var sharporflat;
+  if (Number(sf.options[sf.selectedIndex].value) == 1) sharporflat = "sharp";  
+  else sharporflat = "flat";
+
+  var noteordegree;
+  var ng = document.getElementById("nameOrDegree");
+  if (Number(ng.options[ng.selectedIndex].value) == 1) noteordegree = "sharp";  
+  else noteordegree = "degree";
+
+  // Get root row
+  //alert("rootLabel - " + rootLabel);
+  if (rootLabel.length == 1) column = 1;
+  else {
+    if (sharporflat == "sharp") column = 2;
+    else column = 0;
+  }
+
+  for (var f = 0; f < NoteValue.length; f++) {
+    if (rootValue == NoteValue[f][column]) rootrow = f;
+  }
+
+  for (var string = 0; string < 6; string++) {
+    // Root note of string
+    var root = Tuning[string];
+    var showString = ShowStrings[string];
+
+    for (var fret = 0; fret < 16; fret++) {
+      // Current fretted note
+      var currentfret = root + fret;
+
+      while (currentfret > 12) currentfret = currentfret - 12;
+      // Assign a numeric value if note is found, 0 means not found
+      var foundnote = 0;
+      var notelabel = "";
+      
+      // Print scale extensions, using scale formula
+      for (var q = 0; q < scale.length; q++) {
+        for (var z = 0; z < Intervals.length; z++) { // Extension above root
+          if (Intervals[z] == scale[q]) {
+            var extension = IntervalValue[z];
+            var degree = Number(scale[q].substring(0, 1));
+            var degreestr = scale[q];
+          }
+        }
+
+        var scaledegree = rootValue + extension;
+        while (scaledegree > 12) scaledegree = scaledegree - 12;
+
+        // Use the equality operator (==), not assignment (=)
+        if (scaledegree == currentfret) {
+          for (b = 0; b < 4; b++) {
+            var noterow = rootrow + degree - 1;
+            if (noterow > 6) noterow = noterow - 7;
+            if (NoteValue[noterow][b] == scaledegree) {
+              foundnote = NoteValue[noterow][b];
+
+              if (noteordegree == "degree") notelabel = degreestr;
+              else notelabel = Notes[noterow][b];
+            }
+          }
+        }
+      }
+
+      if (foundnote != 0 && showString == '1') {
+        
+        if (noterow == rootrow)                   
+          drawnotes(canvasname, x + fw/2 + (fret * foffset), y + (string * soffset), true, width);
+        else
+          drawnotes(canvasname, x + fw/2 + (fret * foffset), y + (string * soffset), false, width);
+        
+        labelnotes(canvasname, notelabel, x + fw/2 + (fret * foffset), y + (string * soffset), width);
+      }
+    }
+  }
+}
+
+(function($){})(jQuery);
+
+var Notes = [
+    ["Cb", "C", "C#", "C##"],
+    ["Db", "D", "D#", "D##"],
+    ["Eb", "E", "E#", "E##"],
+    ["Fb", "F", "F#", "F##"],
+    ["Gb", "G", "G#", "G##"],
+    ["Ab", "A", "A#", "A##"],
+    ["Bb", "B", "B#", "B##"]
+  ];
+
+  var NoteValue = [
+    [12, 1, 2, 3],
+    [2, 3, 4, 5],
+    [4, 5, 6, 7],
+    [5, 6, 7, 8],
+    [7, 8, 9, 10],
+    [9, 10, 11, 12],
+    [11, 12, 1, 2]
+  ];
+
+    var ScaleMembers = [
+    ["1,3,5"],
+    ["1,3b,5"],
+    ["1,3b,5b"],
+  ];
+  
+  var Intervals = ["1","1#","2b","2","2#","3b","3","4","4#","5b","5","5#","6b","6","6#","7b","7"];
+  var IntervalValue = [0, 1, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 8, 9, 10, 10, 11];
+  var ShowStrings = [1, 1, 1, 1, 1, 1];  
+  var Tuning = [5, 12, 8, 3, 10, 5];
+  

@@ -1,0 +1,169 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400);
+@import url(https://fonts.googleapis.com/css?family=Inconsolata);
+$base-font: 'Open Sans', sans-serif;
+//$base-font: 'Inconsolata', monospace;
+$bgc:#4c607c;
+$tabc:#b2bbc0;
+$fontc:#596165;
+$tabfontc:white;
+$tabwidth:100%;
+$padx:0px;
+$pady:0px;
+//$tabwidth:950px;
+
+body{
+  background-color: $bgc;
+  height:100%;
+  font-family: $base-font;
+  font-size: 16px;
+  line-height:1.5;
+}
+
+.tab-block{
+  width:$tabwidth;
+  height:200px;
+  margin:5px auto;
+  .tab-mnu{
+    display:block;
+    list-style:none;
+    //&:after{
+    //  content:'';
+    //  display:table;
+    //  clear:both;
+    //}
+    li{
+      box-sizing:border-box;
+      float:left;
+      background-color: $tabc;
+      color:$tabfontc;
+      width:$tabwidth/7;
+      text-align:center;
+      padding-top:13px;
+      padding-bottom:13px;
+      cursor:pointer;
+      &:not(:last-child){
+        border-right:1px solid $bgc;
+      }
+      &:hover:not(.active){
+        background-color: lighten($tabc,5%);
+      }
+    }
+    .active{
+        background-color: #fff;
+        color:$fontc;
+        border-bottom:1px solid lighten($fontc,55%);
+      cursor:default;
+      }
+  }
+  
+  .tab-cont{
+    box-sizing:border-box;
+    border-top:1px solid white;
+    background-color:$tabfontc;
+    color:darken($fontc,20%);
+    .tab-pane{
+      padding:$padx $pady;
+    }
+  }
+    
+}
+
+#options {
+   width: 100%;
+   text-align:center;
+   vertical-align:center;
+    margin:5px auto;
+}
+
+.styled-select.slate select {
+   border: 1px solid #ccc;
+   font-size: 16px;
+   height: 24px;
+   width: 175px;
+   margin: 1px;
+   vertical-align:center;
+}
+
+.multi-select, .multi-select-plugin {	
+	display: inline-block;	
+	position: relative;
+	
+	> span {
+		border: none;
+		background: none;
+		position: relative;
+		padding: .25em .5em;
+		padding-right: 1.5em;
+		display: block;
+		border: solid 1px #000;
+		cursor: default;
+		
+		> .chevron {
+			display: inline-block;
+			transform: rotate(-90deg) scale(1, 2) translate(-50%, 0);
+			font-weight: bold;
+			font-size: .75em;
+			position: absolute;
+			top: .2em;
+			right: .75em;
+		}
+	}
+	
+	> ul {
+		position: absolute;
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		left: 0;
+		top: 100%;
+		min-width: 100%;
+		z-index: 1000;
+		background: #fff;
+		border: 1px solid rgba(0,0,0,.15);
+		box-shadow: 0 6px 12px rgba(0,0,0,.175);
+		display: none;
+		max-height: 320px;
+		overflow-x: hidden;
+		overflow-y: auto;
+		
+		> li {
+			white-space: nowrap;
+			
+			&.selected {
+				> label {
+					background-color: LightBlue;
+				}
+			}
+			
+			&.focused {
+				> label {
+					background-color: DodgerBlue;
+				}
+			}
+			
+			> label {
+				padding: .25em .5em;
+				display: block;
+				
+				&:focus, &:hover {
+					background-color: DodgerBlue;
+				}
+			}
+		}
+	}
+	
+	&.in {
+		> ul {
+			display: block;
+		}
+	}
+	
+	&-backdrop {
+		position: fixed;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 900;
+	}
+}
